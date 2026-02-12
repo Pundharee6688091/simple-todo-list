@@ -92,8 +92,6 @@ app.delete('/api/todos/:id', (req, res) => {
 
 app.put('/api/todos/:id', (req, res) => {
   const id = parseInt(req.params.id);
-  const { text } = req.body;
-  
   const todos = readTodos();
   const todoIndex = todos.findIndex(t => t.id === id);
   
@@ -101,21 +99,22 @@ app.put('/api/todos/:id', (req, res) => {
     return res.status(404).json({ error: 'Todo not found' });
   }
 
-  // If the 'text' key is present, it's an Edit request
-  if (req.body.hasOwnProperty('text')) {
-    if (!text || text.trim() === '') {
+  // Check if "text" key is actually sent in the body
+  if (req.body && typeof req.body.text !== 'undefined') {
+    const newText = req.body.text.trim();
+    if (newText === '') {
       return res.status(400).json({ error: 'Todo text cannot be empty' });
     }
-    todos[todoIndex].text = text.trim(); // Update ONLY the text
+    todos[todoIndex].text = newText;
   } else {
-    // If 'text' is missing, it's a Toggle request
+    // If no text is sent, it's a completion toggle
     todos[todoIndex].completed = !todos[todoIndex].completed;
   }
   
   if (writeTodos(todos)) {
     res.json(todos[todoIndex]);
   } else {
-    res.status(500).json({ error: 'Failed to save todo' });
+    res.status(500).json({ error: 'Failed to update todo' });
   }
 });
 

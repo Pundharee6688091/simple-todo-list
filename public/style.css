@@ -145,21 +145,20 @@ h1 {
 .actions {
     display: flex;
     gap: 8px;
+    margin-left: auto; /* Pushes buttons to the right */
 }
 
 .edit-btn {
-    background: #ffa502; /* Orange color for edit */
+    background: #f1c40f;
     color: white;
     border: none;
-    padding: 8px 15px;
+    padding: 8px 12px;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 14px;
-    transition: background 0.2s;
 }
 
 .edit-btn:hover {
-    background: #eccc68;
+    background: #f39c12;
 }
 
 /* Ensure the delete-btn and edit-btn look consistent */
