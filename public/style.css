@@ -141,3 +141,28 @@ h1 {
     color: #6c757d;
     font-size: 18px;
 }
+
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.edit-btn {
+    background: #ffa502; /* Orange color for edit */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.edit-btn:hover {
+    background: #eccc68;
+}
+
+/* Ensure the delete-btn and edit-btn look consistent */
+.delete-btn, .edit-btn {
+    white-space: nowrap;
+}

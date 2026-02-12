@@ -109,6 +109,35 @@ app.delete('/api/todos/:id', (req, res) => {
   }
 });
 
+app.put('/api/todos/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const { text } = req.body; // Extract text from request body
+  
+  const todos = readTodos();
+  const todoIndex = todos.findIndex(t => t.id === id);
+  
+  if (todoIndex === -1) {
+    return res.status(404).json({ error: 'Todo not found' });
+  }
+
+  // If text is provided in the body, update the text (Editing)
+  if (text !== undefined) {
+    if (text.trim() === '') {
+      return res.status(400).json({ error: 'Todo text cannot be empty' });
+    }
+    todos[todoIndex].text = text.trim();
+  } else {
+    // If no text is provided, toggle the completion (Original behavior)
+    todos[todoIndex].completed = !todos[todoIndex].completed;
+  }
+  
+  if (writeTodos(todos)) {
+    res.json(todos[todoIndex]);
+  } else {
+    res.status(500).json({ error: 'Failed to update todo' });
+  }
+});
+
 // Initialize todos file on startup
 initTodosFile();
 
