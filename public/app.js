@@ -78,6 +78,37 @@ async function toggleTodo(id) {
     }
 }
 
+// Edit todo text (Sends JSON body)
+async function editTodo(id, currentText) {
+    const newText = prompt('Edit your todo:', currentText);
+    
+    // Exit if canceled, empty, or unchanged
+    if (newText === null || newText.trim() === '' || newText.trim() === currentText) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE}/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json', // Required for server to parse body
+            },
+            body: JSON.stringify({ text: newText.trim() }), // Triggers edit logic
+        });
+        
+        if (response.ok) {
+            const updatedTodo = await response.json();
+            const index = todos.findIndex(t => t.id === id);
+            if (index !== -1) {
+                todos[index] = updatedTodo;
+                renderTodos();
+            }
+        }
+    } catch (error) {
+        console.error('Error editing todo:', error);
+    }
+}
+
 // Delete a todo
 async function deleteTodo(id) {
     try {
@@ -97,38 +128,7 @@ async function deleteTodo(id) {
     }
 }
 
-async function editTodo(id, currentText) {
-    const newText = prompt('Edit your todo:', currentText);
-    
-    // If user cancels or enters empty string, do nothing
-    if (newText === null || newText.trim() === '') return;
 
-    try {
-        const response = await fetch(`${API_BASE}/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ text: newText.trim() }),
-        });
-        
-        if (response.ok) {
-            const updatedTodo = await response.json();
-            const index = todos.findIndex(t => t.id === id);
-            if (index !== -1) {
-                todos[index] = updatedTodo;
-                renderTodos();
-            }
-        } else {
-            alert('Failed to update todo');
-        }
-    } catch (error) {
-        console.error('Error editing todo:', error);
-        alert('Failed to update todo');
-    }
-}
-
-// Render todos to the DOM (Updated with Edit button)
 function renderTodos() {
     if (todos.length === 0) {
         todoList.innerHTML = '<div class="empty-state">No todos yet. Add one above!</div>';
@@ -149,7 +149,6 @@ function renderTodos() {
             </div>
         `).join('');
     }
-    
     updateStats();
 }
 

@@ -247,5 +247,50 @@ describe('Todo API Endpoints', () => {
       expect(response.body[1].text).toBe('Todo 2');
       expect(response.body[2].text).toBe('Todo 3');
     });
+
+    test('should edit text WITHOUT changing completion status', async () => {
+  const createRes = await request(app).post('/api/todos').send({ text: 'Initial' });
+  const id = createRes.body.id;
+
+  const response = await request(app)
+    .put(`/api/todos/${id}`)
+    .send({ text: 'Edited' });
+
+  expect(response.status).toBe(200);
+  expect(response.body.text).toBe('Edited'); //
+  expect(response.body.completed).toBe(false); // Should still be false!
+});
+
+    test('should return 400 if trying to edit with empty text', async () => {
+      // Create a todo first
+      const createResponse = await request(app)
+        .post('/api/todos')
+        .send({ text: 'Valid Text' });
+      
+      const todoId = createResponse.body.id;
+      
+      // Attempt to update with empty string
+      const response = await request(app)
+        .put(`/api/todos/${todoId}`)
+        .send({ text: '' });
+      
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('error', 'Todo text cannot be empty');
+    });
+
+    test('should trim whitespace when updating todo text', async () => {
+      const createResponse = await request(app)
+        .post('/api/todos')
+        .send({ text: 'Old Text' });
+      
+      const todoId = createResponse.body.id;
+      
+      const response = await request(app)
+        .put(`/api/todos/${todoId}`)
+        .send({ text: '   New Trimmed Text   ' });
+      
+      expect(response.status).toBe(200);
+      expect(response.body.text).toBe('New Trimmed Text');
+    });
   });
 });
